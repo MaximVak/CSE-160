@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Draw a point (1)</title>
+    <style>
+        .canvas-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+    </style>
+</head>
+
+<body onload="main()">
+    <div class="canvas-container">
+        <canvas id="webgl" width="400" height="400">
+            Please use a browser that supports "canvas"
+        </canvas>
+
+        <img src="Sketch.jpg" alt="my sketch" style="height: 400px; width: auto;">
+    </div>
+
+    <br />
+    <button onclick="clearCanvas()">Clear Canvas</button>
+    <button onclick="drawPicture()">Draw My Picture</button>
+
+    <br /><br />
+    Drawing Mode:<br />
+    <button onclick="setBrush('square')">Squares</button>
+    <button onclick="setBrush('triangle')">Triangles</button>
+    <button onclick="setBrush('circle')">Circles</button>
+
+    <br /><br />
+    Shape Color:<br />
+    Red <input type="range" id="sliderR" min="0" max="255" value="255" />
+    Green <input type="range" id="sliderG" min="0" max="255" value="0" />
+    Blue <input type="range" id="sliderB" min="0" max="255" value="0" />
+
+    <br /><br />
+    Shape Size: <input type="range" id="sliderSize" min="1" max="100" value="20" />
+    (Circles) Segment Count: <input type="range" id="sliderSegments" min="3" max="64" value="20" />
+    <br /><br />Opacity: <input type="range" id="sliderA" min="0" max="255" value="255" />
+
+    <script src="./lib/webgl-utils.js"></script>
+    <script src="./lib/webgl-debug.js"></script>
+    <script src="./lib/cuon-utils.js"></script>
+    <script src="asg1.js"></script>
+</body>
+
+</html>
