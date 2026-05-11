@@ -1,0 +1,181 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #111514;
+  color: #f5f3ec;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  background:
+    linear-gradient(180deg, #182323 0%, #111514 45%, #0c0f10 100%);
+}
+
+.world {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+#webgl {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+
+#webgl:active {
+  cursor: grabbing;
+}
+
+.hud {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  max-width: min(760px, calc(100vw - 32px));
+  padding: 10px 12px;
+  border: 1px solid rgba(245, 243, 236, 0.2);
+  border-radius: 8px;
+  background: rgba(17, 21, 20, 0.68);
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(12px);
+}
+
+.hud strong {
+  flex: 0 0 auto;
+  font-size: 0.78rem;
+  letter-spacing: 0;
+}
+
+.hud span {
+  min-width: 0;
+  overflow: hidden;
+  color: #c9d9d2;
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#texture-status {
+  flex: 1 1 auto;
+}
+
+#fps-status {
+  flex: 0 0 auto;
+}
+
+.crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.crosshair::before,
+.crosshair::after {
+  position: absolute;
+  content: "";
+  background: rgba(72, 77, 80, 0.58);
+  box-shadow: 0 0 4px rgba(245, 248, 250, 0.35);
+}
+
+.crosshair::before {
+  top: 8px;
+  left: 2px;
+  width: 14px;
+  height: 2px;
+}
+
+.crosshair::after {
+  top: 2px;
+  left: 8px;
+  width: 2px;
+  height: 14px;
+}
+
+.legend {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: min(190px, calc(100vw - 32px));
+  padding: 10px 12px;
+  border: 1px solid rgba(245, 243, 236, 0.18);
+  border-radius: 8px;
+  background: rgba(17, 21, 20, 0.56);
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(12px);
+  pointer-events: none;
+}
+
+.legend h2 {
+  margin: 0 0 7px;
+  color: #f5f3ec;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.legend dl {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+
+.legend div {
+  display: grid;
+  grid-template-columns: 54px 1fr;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.legend dt {
+  min-width: 0;
+  color: #f4efe4;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.legend dd {
+  min-width: 0;
+  margin: 0;
+  color: #c9d9d2;
+  font-size: 0.72rem;
+  line-height: 1.25;
+}
+
+@media (max-width: 520px) {
+  .hud {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .hud span {
+    white-space: normal;
+  }
+
+  .legend {
+    top: auto;
+    bottom: 16px;
+    width: min(170px, calc(100vw - 32px));
+  }
+}

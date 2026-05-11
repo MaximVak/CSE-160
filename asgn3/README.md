@@ -1,0 +1,1 @@
+This assignment builds a textured 3D WebGL world with camera movement, a ground plane, sky box, and textured wall cubes.

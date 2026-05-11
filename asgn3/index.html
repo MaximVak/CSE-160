@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CSE 160 Assignment 3</title>
+    <link rel="stylesheet" href="src/styles.css">
+  </head>
+  <body>
+    <main class="world">
+      <canvas id="webgl" aria-label="Textured WebGL world"></canvas>
+      <section class="hud" aria-live="polite">
+        <strong>CSE 160 ASG3</strong>
+        <span id="texture-status">Animals 0/5</span>
+        <span id="fps-status">FPS --</span>
+      </section>
+      <div class="crosshair" aria-hidden="true"></div>
+      <section class="legend" aria-label="Controls">
+        <h2>Controls</h2>
+        <dl>
+          <div><dt>W</dt><dd>move forward</dd></div>
+          <div><dt>A</dt><dd>move left</dd></div>
+          <div><dt>S</dt><dd>move back</dd></div>
+          <div><dt>D</dt><dd>move right</dd></div>
+          <div><dt>Q</dt><dd>turn left</dd></div>
+          <div><dt>E</dt><dd>turn right</dd></div>
+          <div><dt>Mouse</dt><dd>look around</dd></div>
+          <div><dt>Space</dt><dd>jump</dd></div>
+          <div><dt>F</dt><dd>add block</dd></div>
+          <div><dt>R</dt><dd>delete block</dd></div>
+        </dl>
+      </section>
+    </main>
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>
