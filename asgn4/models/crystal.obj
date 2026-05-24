@@ -1,0 +1,26 @@
+# Faceted crystal sample model for CSE 160 Assignment 4
+# Positions and normals are intentionally simple so the assignment OBJ loader can parse them.
+o FacetedCrystal
+v 0.000 1.000 0.000
+v -0.650 0.250 0.000
+v 0.000 0.250 0.650
+v 0.650 0.250 0.000
+v 0.000 0.250 -0.650
+v -0.420 -0.700 0.000
+v 0.000 -0.700 0.420
+v 0.420 -0.700 0.000
+v 0.000 -0.700 -0.420
+v 0.000 -1.000 0.000
+
+f 1 2 3
+f 1 3 4
+f 1 4 5
+f 1 5 2
+f 2 6 7 3
+f 3 7 8 4
+f 4 8 9 5
+f 5 9 6 2
+f 10 7 6
+f 10 8 7
+f 10 9 8
+f 10 6 9

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Draw a point (1)</title>
+    <style>
+        .canvas-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+    </style>
+</head>
+
+<body onload="main()">
+    <div class="canvas-container">
+        <canvas id="webgl" width="400" height="400">
+            Please use a browser that supports "canvas"
+        </canvas>
+
+    </div>
+
+    <br>FPS: <span id="fps">--</span>
+
+    <br><br>Animal Rotation: <input type="range" id="sliderRotation" min="0" max="360" value="0"
+        oninput="updateRotation(this.value)" />
+    <br><br>Front Legs: <input type="range" id="sliderFrontLeg" min="-45" max="45" value="0"
+        oninput="updateFrontLeg(this.value)" />
+    Back Legs: <input type="range" id="sliderBackLeg" min="-45" max="45" value="0"
+        oninput="updateBackLeg(this.value)" />
+    Tail: <input type="range" id="sliderTail" min="-45" max="45" value="0" oninput="updateTail(this.value)" />
+    <br />
+    Front Lower Legs: <input type="range" id="sliderFrontLowerLeg" min="-45" max="45" value="0"
+        oninput="updateFrontLowerLeg(this.value)" />
+    Back Lower Legs: <input type="range" id="sliderBackLowerLeg" min="-45" max="45" value="0"
+        oninput="updateBackLowerLeg(this.value)" />
+
+    <br>
+    Front Paws: <input type="range" id="sliderFrontPaw" min="-45" max="45" value="0"
+        oninput="updateFrontPaw(this.value)" />
+    Back Paws: <input type="range" id="sliderBackPaw" min="-45" max="45" value="0"
+        oninput="updateBackPaw(this.value)" />
+
+    <br><br><button onclick="toggleAnimation()">Toggle Animation</button>
+
+    <script src="./lib/cuon-matrix.js"></script>
+    <script src="./lib/cuon-utils.js"></script>
+    <script src="./lib/webgl-utils.js"></script>
+    <script src="./lib/webgl-debug.js"></script>
+
+    <script src="asg2.js"></script>
+    <script src="sphere.js"></script>
+    <script src="cube.js"></script>
+    <script src="point.js"></script>
+    <script src="triangle.js"></script>
+</body>
+
+</html>

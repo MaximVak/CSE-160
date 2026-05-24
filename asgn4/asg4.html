@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSE 160 Assignment 4</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="stage">
+      <canvas id="webgl" width="900" height="600" aria-label="WebGL canvas"></canvas>
+    </section>
+
+    <aside class="controls" aria-label="Scene controls">
+      <h1>Assignment 4</h1>
+
+      <label class="control-row" for="cameraAngle">
+        <span>Camera angle</span>
+        <output id="cameraAngleValue" for="cameraAngle">35 deg</output>
+      </label>
+      <input id="cameraAngle" type="range" min="-180" max="180" value="35">
+
+      <label class="control-row control-row-spaced" for="lightAngle">
+        <span>Light angle</span>
+        <output id="lightAngleValue" for="lightAngle">35 deg</output>
+      </label>
+      <input id="lightAngle" type="range" min="0" max="360" value="35">
+
+      <label class="control-row control-row-spaced" for="lightHue">
+        <span>Light color</span>
+        <output id="lightHueValue" for="lightHue">48 deg</output>
+      </label>
+      <input id="lightHue" type="range" min="0" max="360" value="48">
+
+      <button id="normalToggle" class="toggle-button" type="button" aria-pressed="false">
+        Normal Visualization: Off
+      </button>
+
+      <button id="lightingToggle" class="toggle-button" type="button" aria-pressed="true">
+        Lighting: On
+      </button>
+
+      <button id="spotlightToggle" class="toggle-button" type="button" aria-pressed="true">
+        Spotlight: On
+      </button>
+
+      <div class="hint">Use Left and Right arrow keys, or drag on the canvas.</div>
+    </aside>
+  </main>
+
+  <script src="asg4.js"></script>
+</body>
+</html>
