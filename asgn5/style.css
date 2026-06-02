@@ -1,0 +1,124 @@
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #000000;
+}
+
+#c {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
+#loading {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.progress {
+  width: min(360px, 60vw);
+  border: 1px solid #ffffff;
+  background: #111111;
+}
+
+.progressbar {
+  height: 14px;
+  margin: 2px;
+  background: #ffffff;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.lil-gui.root {
+  --background-color: #111111;
+  --widget-color: #414141;
+  --hover-color: #505050;
+  --focus-color: #5a5a5a;
+  --number-color: #66c7ff;
+  --string-color: #eeeeee;
+  --title-background-color: #050505;
+}
+
+.hud {
+  position: fixed;
+  left: 18px;
+  top: 18px;
+  width: min(280px, calc(100vw - 36px));
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+  background: rgba(7, 8, 10, 0.72);
+  color: #f7f4ee;
+  font-size: 15px;
+  line-height: 1.35;
+  backdrop-filter: blur(8px);
+}
+
+.hud-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 6px;
+}
+
+.hud-row span {
+  color: #c9d6df;
+}
+
+.hud-row strong {
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+}
+
+.hud p {
+  margin: 10px 0 0;
+  color: #d7e3ea;
+}
+
+#flash-message {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  padding: 18px 28px;
+  border: 2px solid #ffffff;
+  border-radius: 8px;
+  background: rgba(160, 18, 18, 0.88);
+  color: #ffffff;
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.9);
+}
+
+#flash-message.show {
+  animation: flash-message 0.9s ease-out;
+}
+
+@keyframes flash-message {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.85);
+  }
+
+  18%,
+  72% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+}
