@@ -22,13 +22,20 @@
     <section class="hud" aria-label="Game status">
       <div class="hud-row">
         <span>Score</span>
-        <strong id="score">0/8</strong>
+        <strong id="score">0/12</strong>
       </div>
       <div class="hud-row">
         <span>Time</span>
         <strong id="timer">60</strong>
       </div>
-      <p id="message">Use WASD or arrows. Collect wheat, dodge chickens, reach the windmill.</p>
+      <div class="hud-row">
+        <span>Mode</span>
+        <strong id="mode">Day</strong>
+      </div>
+      <div class="progress-track" aria-label="Progress to windmill">
+        <div id="route-progress"></div>
+      </div>
+      <p id="message">Use WASD or arrows. Collect wheat, dodge chickens, reach the windmill. Press N for night mode.</p>
     </section>
     <div id="flash-message" aria-live="polite">TRY AGAIN</div>
 

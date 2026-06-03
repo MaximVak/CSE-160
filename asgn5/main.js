@@ -11,6 +11,8 @@ const scoreElem = document.querySelector('#score');
 const timerElem = document.querySelector('#timer');
 const messageElem = document.querySelector('#message');
 const flashMessageElem = document.querySelector('#flash-message');
+const modeElem = document.querySelector('#mode');
+const routeProgressElem = document.querySelector('#route-progress');
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x000000);
@@ -46,6 +48,7 @@ exrLoader.load('kloppenheim_06_puresky_4k.exr', (texture) => {
   texture.mapping = THREE.EquirectangularReflectionMapping;
   scene.background = texture;
   scene.environment = texture;
+  gameState.dayBackground = texture;
 });
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.45);
@@ -110,6 +113,7 @@ const chickens = [];
 const wheat = [];
 const staticBlockers = [];
 const animatedWheels = [];
+const celebrationParticles = [];
 const playerStart = new THREE.Vector3(0, 0, -11.5);
 const finishZ = 13.9;
 const gameState = {
@@ -117,11 +121,16 @@ const gameState = {
   total: 12,
   timeLeft: 90,
   isOver: false,
+  hasWon: false,
+  isNight: false,
+  dayBackground: null,
   lastCrashAt: -10
 };
 
 let playerCar;
 let windmillModel;
+let windmillBlades;
+let celebrationLight;
 
 function makeMaterial(color, options = {}) {
   return new THREE.MeshStandardMaterial({
@@ -167,8 +176,9 @@ function createWorld() {
   scene.add(base);
 
   for (let z = -11.5; z <= 13.5; z += 1.75) {
-    const isRoad = [-8, -4.5, -1, 2.5, 6, 9.5].some((roadZ) => Math.abs(z - roadZ) < 0.2);
-    const isField = [-6.25, 0.75, 7.75].some((fieldZ) => Math.abs(z - fieldZ) < 0.2);
+    const roadZ = [-8, -4.5, 0.75, 2.5, 6, 9.5].find((value) => Math.abs(z - value) < 0.2);
+    const isRoad = roadZ !== undefined;
+    const isField = [-6.25, 7.75].some((fieldZ) => Math.abs(z - fieldZ) < 0.2);
     createLane(z, isRoad ? roadMaterial : isField ? fieldMaterial : grassMaterial);
 
     if (isRoad) {
@@ -178,6 +188,33 @@ function createWorld() {
         scene.add(stripe);
       }
     }
+  }
+}
+
+function createCelebrationEffects() {
+  celebrationLight = new THREE.PointLight(0xffd96a, 0, 16);
+  celebrationLight.position.set(0, 4.2, 15.2);
+  scene.add(celebrationLight);
+
+  const particleMaterial = makeMaterial(0xf4cf55, {
+    roughness: 0.35,
+    metalness: 0.18,
+    emissive: 0x8a5c00,
+    emissiveIntensity: 0.45
+  });
+
+  for (let i = 0; i < 70; i += 1) {
+    const particle = new THREE.Mesh(
+      new THREE.SphereGeometry(0.045, 8, 6),
+      particleMaterial
+    );
+    particle.visible = false;
+    scene.add(particle);
+    celebrationParticles.push({
+      mesh: particle,
+      velocity: new THREE.Vector3(),
+      life: 0
+    });
   }
 }
 
@@ -250,6 +287,7 @@ function createChicken(laneZ, startX, direction, speed, hasChicks = false) {
   const chicken = new THREE.Group();
   chicken.position.set(startX, 0, laneZ);
   chicken.userData.direction = direction;
+  chicken.userData.baseSpeed = speed;
   chicken.userData.speed = speed;
   chicken.userData.minX = -5.4;
   chicken.userData.maxX = 5.4;
@@ -272,8 +310,8 @@ function createChickens() {
     [-8, 1.4, 1, 2.0],
     [-4.5, 4.8, -1, 2.4],
     [-4.5, -1.4, -1, 2.4],
-    [-1, -5.1, 1, 2.7],
-    [-1, 0.6, 1, 2.7],
+    [0.75, -5.1, 1, 2.7],
+    [0.75, 0.6, 1, 2.7],
     [2.5, 5, -1, 2.2],
     [2.5, -0.8, -1, 2.2],
     [6, -4.8, 1, 2.9],
@@ -287,6 +325,13 @@ function createChickens() {
   });
 }
 
+function updateChickenDifficulty() {
+  const multiplier = 1 + gameState.score * 0.08;
+  chickens.forEach((chicken) => {
+    chicken.userData.speed = chicken.userData.baseSpeed * multiplier;
+  });
+}
+
 function createWheat(position, index) {
   const wheatGroup = new THREE.Group();
   wheatGroup.position.copy(position);
@@ -294,22 +339,28 @@ function createWheat(position, index) {
   wheatGroup.userData.index = index;
   scene.add(wheatGroup);
 
-  const stemMaterial = makeMaterial(0xd5ad42, { roughness: 0.7 });
-  const grainMaterial = makeMaterial(0xf2d36b, {
+  const stemMaterial = makeMaterial(0xc99a2e, { roughness: 0.7 });
+  const grainMaterial = makeMaterial(0xf1cf5a, {
     roughness: 0.45,
-    emissive: 0x4a3300,
-    emissiveIntensity: 0.25
+    emissive: 0x4a3200,
+    emissiveIntensity: 0.22
   });
-  const bandMaterial = makeMaterial(0x7a4a1f, { roughness: 0.6 });
 
-  for (let i = 0; i < 7; i += 1) {
-    const x = (i - 3) * 0.055;
-    const rotation = new THREE.Euler(0.12 * (i - 3), 0, 0.12 * (i - 3));
-    addMesh(wheatGroup, new THREE.CylinderGeometry(0.022, 0.022, 0.62, 10), stemMaterial, new THREE.Vector3(x, 0.32, 0), rotation);
-    addMesh(wheatGroup, new THREE.ConeGeometry(0.07, 0.16, 12), grainMaterial, new THREE.Vector3(x, 0.68, 0), rotation);
+  addMesh(wheatGroup, new THREE.CylinderGeometry(0.035, 0.035, 0.95, 12), stemMaterial, new THREE.Vector3(0, 0.48, 0));
+
+  for (let i = 0; i < 6; i += 1) {
+    const y = 0.75 + i * 0.075;
+    const side = i % 2 === 0 ? -1 : 1;
+    addMesh(
+      wheatGroup,
+      new THREE.ConeGeometry(0.075, 0.18, 12),
+      grainMaterial,
+      new THREE.Vector3(side * 0.085, y, 0),
+      new THREE.Euler(0, 0, side * 0.75)
+    );
   }
 
-  addMesh(wheatGroup, new THREE.BoxGeometry(0.46, 0.08, 0.18), bandMaterial, new THREE.Vector3(0, 0.34, 0));
+  addMesh(wheatGroup, new THREE.ConeGeometry(0.085, 0.22, 12), grainMaterial, new THREE.Vector3(0, 1.23, 0));
 
   wheat.push(wheatGroup);
 }
@@ -355,9 +406,15 @@ function createPond(position, scaleX = 1, scaleZ = 1) {
 function createBlockers() {
   createPond(new THREE.Vector3(-2.7, 0, -3.05), 1.1, 0.62);
   createPond(new THREE.Vector3(2.7, 0, 4.35), 0.82, 1.15);
+  createPond(new THREE.Vector3(-3.15, 0, 8.35), 0.7, 0.9);
+  createPond(new THREE.Vector3(3.2, 0, -10.55), 0.58, 0.72);
   createTree(new THREE.Vector3(3.7, 0, -9.6), 0.82);
   createTree(new THREE.Vector3(-3.8, 0, -0.2), 0.95);
   createTree(new THREE.Vector3(0.1, 0, 11.15), 0.8);
+  createTree(new THREE.Vector3(-4.05, 0, -6.2), 0.75);
+  createTree(new THREE.Vector3(4.0, 0, -1.85), 0.7);
+  createTree(new THREE.Vector3(-0.95, 0, 4.9), 0.68);
+  createTree(new THREE.Vector3(4.05, 0, 10.95), 0.78);
 }
 
 function createWheatField() {
@@ -382,6 +439,10 @@ function createWheatField() {
 function updateHud() {
   scoreElem.textContent = `${gameState.score}/${gameState.total}`;
   timerElem.textContent = Math.max(0, Math.ceil(gameState.timeLeft)).toString();
+  modeElem.textContent = gameState.isNight ? 'Night' : 'Day';
+
+  const progress = gameState.score / gameState.total;
+  routeProgressElem.style.width = `${Math.round(progress * 100)}%`;
 }
 
 function setMessage(text) {
@@ -402,11 +463,28 @@ function flashWin() {
   flashMessageElem.classList.add('show');
 }
 
+function launchCelebration() {
+  const origin = new THREE.Vector3(0, 1.8, 15.2);
+  celebrationParticles.forEach((particle, index) => {
+    const angle = (index / celebrationParticles.length) * Math.PI * 2;
+    const lift = 1.1 + (index % 9) * 0.08;
+    particle.mesh.position.copy(origin);
+    particle.mesh.visible = true;
+    particle.velocity.set(
+      Math.cos(angle) * (0.8 + (index % 5) * 0.12),
+      lift,
+      Math.sin(angle) * (0.8 + (index % 7) * 0.1)
+    );
+    particle.life = 2.4 + (index % 6) * 0.08;
+  });
+}
+
 function resetWheat() {
   gameState.score = 0;
   wheat.forEach((grain) => {
     grain.visible = true;
   });
+  updateChickenDifficulty();
 }
 
 function resetPlayerAfterCollision(time) {
@@ -464,6 +542,7 @@ function updatePlayer(delta, time) {
     if (playerCar.position.distanceTo(grain.position) < 0.62) {
       grain.visible = false;
       gameState.score += 1;
+      updateChickenDifficulty();
       setMessage(gameState.score === gameState.total ? 'All wheat collected. Reach the windmill.' : 'Wheat collected.');
     }
   });
@@ -471,11 +550,35 @@ function updatePlayer(delta, time) {
   if (playerCar.position.z >= finishZ) {
     if (gameState.score === gameState.total) {
       gameState.isOver = true;
+      gameState.hasWon = true;
       setMessage('You reached the windmill with all wheat. You win!');
       flashWin();
+      launchCelebration();
     } else {
       setMessage('Collect all wheat before reaching the windmill.');
     }
+  }
+}
+
+function toggleDayNight() {
+  gameState.isNight = !gameState.isNight;
+
+  if (gameState.isNight) {
+    scene.background = new THREE.Color(0x07111f);
+    scene.environment = null;
+    ambientLight.intensity = 0.18;
+    hemisphereLight.intensity = 0.28;
+    directionalLight.intensity = 0.45;
+    pointLight.intensity = 7;
+    setMessage('Night mode. Press N to return to day.');
+  } else {
+    scene.background = gameState.dayBackground || new THREE.Color(0x8ebce6);
+    scene.environment = gameState.dayBackground;
+    ambientLight.intensity = 0.45;
+    hemisphereLight.intensity = 0.9;
+    directionalLight.intensity = 2.5;
+    pointLight.intensity = 4;
+    setMessage('Day mode. Press N for night mode.');
   }
 }
 
@@ -511,7 +614,7 @@ function fitWindmillToScene(model) {
   const size = box.getSize(new THREE.Vector3());
   const center = box.getCenter(new THREE.Vector3());
   const maxSize = Math.max(size.x, size.y, size.z);
-  const scale = 2.0 / maxSize;
+  const scale = 4.0 / maxSize;
 
   model.scale.setScalar(scale);
   model.position.set(
@@ -519,7 +622,7 @@ function fitWindmillToScene(model) {
     -box.min.y * scale,
     -center.z * scale + 15.25
   );
-  model.rotation.y = Math.PI;
+  model.rotation.y = Math.PI / 2;
 }
 
 function prepWindmill(root) {
@@ -534,6 +637,12 @@ function prepWindmill(root) {
     if (name.includes('lopatky')) {
       child.material = child.material || windmillMaterials.lopatky;
       child.material.side = THREE.DoubleSide;
+      child.geometry.computeBoundingBox();
+      const bladeCenter = child.geometry.boundingBox.getCenter(new THREE.Vector3());
+      child.geometry.translate(-bladeCenter.x, -bladeCenter.y, -bladeCenter.z);
+      child.position.copy(bladeCenter);
+      child.userData.baseRotation = child.rotation.clone();
+      windmillBlades = child;
     } else if (name.includes('mlyn')) {
       child.material = child.material || windmillMaterials.mlyn;
     } else {
@@ -559,6 +668,7 @@ mtlLoader.load('windmill_001.mtl', (materials) => {
 });
 
 createWorld();
+createCelebrationEffects();
 createCar();
 createChickens();
 createWheatField();
@@ -566,6 +676,9 @@ createBlockers();
 updateHud();
 
 window.addEventListener('keydown', (event) => {
+  if (event.code === 'KeyN' && !event.repeat) {
+    toggleDayNight();
+  }
   keys.add(event.code);
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(event.code)) {
     event.preventDefault();
@@ -616,6 +729,30 @@ function render(time) {
 
   animatedWheels.forEach((wheel) => {
     wheel.rotation.z = time * 5;
+  });
+
+  if (windmillBlades && gameState.hasWon) {
+    windmillBlades.rotation.copy(windmillBlades.userData.baseRotation);
+    windmillBlades.rotation.x += time * 4.5;
+  }
+
+  if (celebrationLight) {
+    celebrationLight.intensity = gameState.hasWon ? 6 + Math.sin(time * 8) * 1.8 : 0;
+  }
+
+  celebrationParticles.forEach((particle) => {
+    if (!particle.mesh.visible) {
+      return;
+    }
+
+    particle.life -= delta;
+    particle.velocity.y -= delta * 1.8;
+    particle.mesh.position.addScaledVector(particle.velocity, delta);
+    particle.mesh.scale.setScalar(Math.max(particle.life / 2.5, 0.15));
+
+    if (particle.life <= 0) {
+      particle.mesh.visible = false;
+    }
   });
 
   wheat.forEach((grain, index) => {
